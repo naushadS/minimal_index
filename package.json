@@ -1,0 +1,22 @@
+{
+  "name": "minimal_index",
+  "version": "1.0.0",
+  "description": "minimal index.js to host apis locally",
+  "main": "index.js",
+  "dependencies": {
+    "command-line-args": "4.0.7",
+    "dotenv": "4.0.0",
+    "lodash": "4.17.4",
+    "require-tree": "1.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "minimal",
+    "index.js"
+  ],
+  "author": "Naushad Shukoor",
+  "license": "ISC"
+}
