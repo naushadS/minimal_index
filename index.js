@@ -5,6 +5,7 @@ let requireTree = require('require-tree');
 let _ = require('lodash');
 require('dotenv').config();
 let bunyan = require('bunyan');
+let redis = require('redis');
 
 //Declarations
 var server = http.createServer(handler);
@@ -23,14 +24,15 @@ let routes = {
 }
 
 let runtime = {
-    dbs: {},
+    db: {},
     log: "",
     routes: routes
 }
 let log;
-console.log('Environment Config====>',JSON.parse(process.env.dbs)[process.env.name]);
+let config = JSON.parse(process.env.dbs)[process.env.name];
+console.log('Environment Config====>',config);
 //Starting Point
-init();
+initDBs();
 
 function sendJson(obj, statusCode) {
     let sObj = JSON.stringify(obj);
@@ -97,7 +99,7 @@ function handler(req, res) {
 function initApis(functions, filename, path) {
     functions.init(runtime);
     functions = _.omit(functions, 'init');
-    console.log("Inside initApis", 'functions=>', functions, 'filename=>', filename, 'path=>', path);
+    //console.log("Inside initApis", 'functions=>', functions, 'filename=>', filename, 'path=>', path);
     for (let fun in functions) {
         let apiPath = path.replace(__dirname + '/apis', '');
         apiPath = apiPath.substring(0, apiPath.length - 3).concat('/' + fun);
@@ -107,10 +109,17 @@ function initApis(functions, filename, path) {
     }
 }
 
+function initModels(functions, filename, path){
+    functions.init(runtime);
+}
+
 function init() {
     requireTree('./apis', {
         each: initApis
     });
+    requireTree('./models',{
+        each: initModels
+    })
     console.log(routes);
     let bun = bunyan.createLogger({
         "name":"logs",
@@ -122,7 +131,17 @@ function init() {
 });
 runtime.log = bun;
 log = runtime.log;
-log.logit("Starting index ===========>");
+log.info("Starting index ===========>");
+}
+
+function initDBs(){
+    if(config.redis){
+        runtime.db.redis=redis.createClient(config.redis);
+        runtime.db.redis.on('error',(error)=>{});
+        init();
+    }else{
+        init();
+    }
 }
 
 server.listen(options.port, () => {

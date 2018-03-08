@@ -4,9 +4,11 @@
   "description": "minimal index.js to host apis locally",
   "main": "index.js",
   "dependencies": {
+    "bunyan": "1.8.12",
     "command-line-args": "4.0.7",
     "dotenv": "4.0.0",
     "lodash": "4.17.4",
+    "redis": "2.8.0",
     "require-tree": "1.1.1"
   },
   "devDependencies": {},
