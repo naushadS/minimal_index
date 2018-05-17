@@ -5,6 +5,7 @@ let requireTree = require('require-tree');
 let _ = require('lodash');
 require('dotenv').config();
 let bunyan = require('bunyan');
+let BunyanElasticSearch = require('bunyan-elasticsearch');
 let redis = require('redis');
 
 //Declarations
@@ -119,19 +120,41 @@ function init() {
     });
     requireTree('./models',{
         each: initModels
-    })
+    });
     console.log(routes);
-    let bun = bunyan.createLogger({
-        "name":"logs",
+    let jsonbaba1 = {
+        "indexPattern": "[minimalindexlogs-]YYYY.MM.DD",
+        "type": "minimalindexlogs",
+        "host": "localhost:9200"
+    }
+    let esStream = new BunyanElasticSearch(jsonbaba1);
+
+    esStream.on('error', function (err) {
+        console.log('Elasticsearch Stream Error:', err.stack);
+    });
+
+ let jsonbaba = {
+        "name":"minimalindexlogs",
+        "src":true,
         "streams":[
-        {
-                "path":"./logs"
-        }
-]
-});
-runtime.log = bun;
-log = runtime.log;
-log.info("Starting index ===========>");
+            {
+                "path": "./logs"
+            }
+        ]
+    };
+    let bun = bunyan.createLogger({
+        name:jsonbaba.name,
+        src:jsonbaba.src,
+        streams:[
+            {stream: esStream},
+            {
+                path: jsonbaba.streams[0].path
+            }
+        ]
+    });
+    runtime.log = bun;
+    log = runtime.log;
+    log.info("Starting index ===========>");
 }
 
 function initDBs(){
@@ -145,5 +168,5 @@ function initDBs(){
 }
 
 server.listen(options.port, () => {
-    console.log('listening at port', options.port);
+    console.log('listening on port', options.port);
 });

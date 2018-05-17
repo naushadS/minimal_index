@@ -4,7 +4,9 @@
   "description": "minimal index.js to host apis locally",
   "main": "index.js",
   "dependencies": {
+    "async": "2.6.0",
     "bunyan": "1.8.12",
+    "bunyan-elasticsearch": "1.0.1",
     "command-line-args": "4.0.7",
     "dotenv": "4.0.0",
     "lodash": "4.17.4",
